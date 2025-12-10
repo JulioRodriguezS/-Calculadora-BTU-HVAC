@@ -156,9 +156,9 @@
               <ion-button id="btnPdf" fill="outline" color="medium" expand="block" style="color:#fbfcff !important;">
                 <ion-icon slot="start" name="download-outline"></ion-icon> Descargar PDF
               </ion-button>
-              <ion-button id="btnShare" expand="block" color="primary" style="display: none;">
+              <!-- <ion-button id="btnShare" expand="block" color="primary" style="display:none;">
                 <ion-icon slot="start" name="share-social-outline"></ion-icon> Compartir
-              </ion-button>
+              </ion-button> -->
             </div>
           </ion-card-content>
         </ion-card>
@@ -171,62 +171,94 @@
       </ion-content>
     </ion-app>
 
-    <script type="module">
-      // Constantes
-      const BASE_AREA_M2=30, BASE_AREA_BTUS=28800;
-      const BTU_POR_PERSONA=650, BTU_POR_M2_VENTANA=450, BTU_POR_LUMINARIA=200;
-      const CAPACIDADES_KBTU=[12,18,24,36,46];
-      const MIN_CAP_KBTU=Math.min(...CAPACIDADES_KBTU);
+    <!-- JS sin module para máxima compatibilidad móvil -->
+    <script defer>
+      // --- Constantes ---
+      var BASE_AREA_M2=30, BASE_AREA_BTUS=28800;
+      var BTU_POR_PERSONA=650, BTU_POR_M2_VENTANA=450, BTU_POR_LUMINARIA=200;
+      var CAPACIDADES_KBTU=[12,18,24,36,46];
+      var MIN_CAP_KBTU=Math.min.apply(null, CAPACIDADES_KBTU);
 
-      const fmt=new Intl.NumberFormat('es-MX');
-      const $=(id)=>document.getElementById(id);
-      const n=(v)=>{const x=parseFloat(String(v).replace(',','.')); return Number.isFinite(x)?x:0;};
-      const tonsFromBTU=(btus)=>btus/12000;
+      var fmt=new Intl.NumberFormat('es-MX');
+      var $=function(id){ return document.getElementById(id); };
+      var n=function(v){ var x=parseFloat(String(v).replace(',','.')); return isFinite(x)?x:0; };
+      var tonsFromBTU=function(btus){ return btus/12000; };
 
-      let lastTotal=0, lastCombos=[];
+      var lastTotal=0, lastCombos=[];
+
+      function isIOS(){
+        return /iphone|ipad|ipod/i.test(navigator.userAgent);
+      }
 
       async function loadLogoDataURL(){
         try{
-          const url=new URL('logo.png', document.baseURI).toString();
-          const resp=await fetch(url); if(!resp.ok) return null;
-          const blob=await resp.blob();
-          return await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob);});
-        }catch{ return null; }
+          var url=new URL('logo.png', document.baseURI).toString();
+          var resp=await fetch(url); if(!resp.ok) return null;
+          var blob=await resp.blob();
+          return await new Promise(function(res,rej){
+            var r=new FileReader();
+            r.onload=function(){ res(r.result); };
+            r.onerror=rej;
+            r.readAsDataURL(blob);
+          });
+        }catch(e){ return null; }
       }
 
-      function mejoresCombos(target, unidadesBTU, maxEquipos=4, permitirSobre=true, topN=5){
-        const res=[]; let bestAbs=Infinity;
-        unidadesBTU.sort((a,b)=>b-a);
-        const rank=(a,b)=> a.diff-b.diff || a.equipos-b.equipos || (permitirSobre?((a.suma>=target?0:1)-(b.suma>=target?0:1)):0) || (b.suma-a.suma);
-        function push(combo){
-          const suma=combo.reduce((a,b)=>a+b,0), diff=Math.abs(target-suma);
-          const item={listaBTU:[...combo], suma, diff, equipos:combo.length};
-          if(!res.some(x=>x.suma===suma && x.equipos===item.equipos)){ res.push(item); res.sort(rank); if(res.length>topN) res.length=topN; bestAbs=res[0]?.diff??bestAbs; }
+      function mejoresCombos(target, unidadesBTU, maxEquipos, permitirSobre, topN){
+        if(maxEquipos==null) maxEquipos=4;
+        if(permitirSobre==null) permitirSobre=true;
+        if(topN==null) topN=5;
+
+        var res=[]; var bestAbs=Infinity;
+        unidadesBTU.sort(function(a,b){ return b-a; });
+
+        function rank(a,b){
+          if(a.diff!==b.diff) return a.diff-b.diff;
+          if(a.equipos!==b.equipos) return a.equipos-b.equipos;
+          if(permitirSobre){
+            var as=a.suma>=target?0:1, bs=b.suma>=target?0:1;
+            if(as!==bs) return as-bs;
+          }
+          return b.suma-a.suma;
         }
+
+        function push(combo){
+          var suma=combo.reduce(function(x,y){ return x+y; },0);
+          var diff=Math.abs(target-suma);
+          var item={ listaBTU: combo.slice(), suma: suma, diff: diff, equipos: combo.length };
+          var dup=res.some(function(x){ return x.suma===suma && x.equipos===item.equipos; });
+          if(!dup){
+            res.push(item); res.sort(rank);
+            if(res.length>topN) res.length=topN;
+            bestAbs = res.length>0 && typeof res[0].diff==='number' ? res[0].diff : bestAbs; // sin ?.
+          }
+        }
+
         function dfs(i, combo, suma){
           if(combo.length>0) push(combo);
           if(combo.length===maxEquipos) return;
-          for(let idx=i; idx<unidadesBTU.length; idx++){
-            const cap=unidadesBTU[idx], ns=suma+cap;
+          for(var idx=i; idx<unidadesBTU.length; idx++){
+            var cap=unidadesBTU[idx], ns=suma+cap;
             if(!permitirSobre && ns>target) continue;
-            if(res.length && Math.abs(target-ns)>bestAbs+cap) continue;
+            if(res.length && Math.abs(target-ns) > bestAbs + cap) continue;
             combo.push(cap); dfs(idx, combo, ns); combo.pop();
           }
         }
-        dfs(0,[],0); return res;
+        dfs(0, [], 0);
+        return res;
       }
 
       function calcular(){
-        const area=Math.max(0,n($("area").value));
-        const personas=Math.max(0,Math.floor(n($("personas").value)));
-        const areaVentanas=Math.max(0,n($("areaVentanas").value));
-        const luminarias=Math.max(0,Math.floor(n($("luminarias").value)));
+        var area=Math.max(0,n($("area").value));
+        var personas=Math.max(0,Math.floor(n($("personas").value)));
+        var areaVentanas=Math.max(0,n($("areaVentanas").value));
+        var luminarias=Math.max(0,Math.floor(n($("luminarias").value)));
 
-        const btusArea=(BASE_AREA_BTUS*area)/BASE_AREA_M2;
-        const btusPersonas=BTU_POR_PERSONA*personas;
-        const btusVentanas=BTU_POR_M2_VENTANA*areaVentanas;
-        const btusLuminarias=BTU_POR_LUMINARIA*luminarias;
-        const total=btusArea+btusPersonas+btusVentanas+btusLuminarias;
+        var btusArea=(BASE_AREA_BTUS*area)/BASE_AREA_M2;
+        var btusPersonas=BTU_POR_PERSONA*personas;
+        var btusVentanas=BTU_POR_M2_VENTANA*areaVentanas;
+        var btusLuminarias=BTU_POR_LUMINARIA*luminarias;
+        var total=btusArea+btusPersonas+btusVentanas+btusLuminarias;
 
         $("s5").textContent=fmt.format(Math.round(total))+" BTU";
         $("tons").textContent=tonsFromBTU(total).toFixed(2)+" ton";
@@ -235,171 +267,191 @@
       }
 
       function pintarCombos(totalBTU){
-        const unidades=CAPACIDADES_KBTU.map(k=>Math.round(k*1000));
-        const overshoot=$("toggleOvershoot").checked;
-        const autoMax=Math.min(8, Math.max(3, Math.ceil(totalBTU/(MIN_CAP_KBTU*1000))+2));
-        const combos=mejoresCombos(totalBTU, unidades, autoMax, overshoot, 5);
+        var unidades=CAPACIDADES_KBTU.map(function(k){ return Math.round(k*1000); });
+        var overshoot=$("toggleOvershoot").checked;
+        var autoMax=Math.min(8, Math.max(3, Math.ceil(totalBTU/(MIN_CAP_KBTU*1000))+2));
+        var combos=mejoresCombos(totalBTU, unidades, autoMax, overshoot, 5);
         lastCombos=combos;
 
-        const cont=$("combos"); cont.innerHTML="";
+        var cont=$("combos"); cont.innerHTML="";
         if(!combos.length){
-          cont.innerHTML=`<div class="hint">No hay combinación posible con los límites actuales.</div>`;
+          cont.innerHTML='<div class="hint">No hay combinación posible con los límites actuales.</div>';
           $("nota").textContent=""; return;
         }
 
-        cont.innerHTML=combos.map((c,i)=>{
-          const diff=c.suma-lastTotal, sign=diff>=0?"+":"−", abs=Math.abs(diff), clase=diff>=0?"ok":"warn";
-          const k=c.listaBTU.map(x=>Math.round(x/1000));
-          return `
-            <ion-item lines="full">
-              <ion-label>
-                <div><strong>#${i+1}</strong> • ${c.equipos} equipo(s)</div>
-                <div class="chips" style="margin:6px 0 8px;">${k.map(x=>`<span class="chip">${x} KBTU</span>`).join("")}</div>
-                <div class="muted">Suma: <span class="mono">${fmt.format(Math.round(c.suma))}</span> BTU · ≈ <span class="mono">${tonsFromBTU(c.suma).toFixed(2)}</span> ton</div>
-              </ion-label>
-              <div slot="end" class="right">
-                <div class="mono ${clase}">${sign}${fmt.format(Math.round(abs))} BTU</div>
-                <div class="hint">vs. objetivo</div>
-              </div>
-            </ion-item>`;
-        }).join("");
+        cont.innerHTML=combos.map(function(c,i){
+          var diff=c.suma-lastTotal, sign=diff>=0?"+":"−", abs=Math.abs(diff), clase=diff>=0?"ok":"warn";
+          var k=c.listaBTU.map(function(x){ return Math.round(x/1000); });
+          return (
+            '<ion-item lines="full">'+
+              '<ion-label>'+
+                '<div><strong>#'+(i+1)+'</strong> • '+c.equipos+' equipo(s)</div>'+
+                '<div class="chips" style="margin:6px 0 8px;">'+ k.map(function(x){ return '<span class="chip">'+x+' KBTU</span>'; }).join('') +'</div>'+
+                '<div class="muted">Suma: <span class="mono">'+fmt.format(Math.round(c.suma))+'</span> BTU · ≈ <span class="mono">'+tonsFromBTU(c.suma).toFixed(2)+'</span> ton</div>'+
+              '</ion-label>'+
+              '<div slot="end" class="right">'+
+                '<div class="mono '+clase+'">'+sign+fmt.format(Math.round(abs))+' BTU</div>'+
+                '<div class="hint">vs. objetivo</div>'+
+              '</div>'+
+            '</ion-item>'
+          );
+        }).join('');
 
-        const minCap=Math.min(...unidades);
-        $("nota").innerHTML = `
-          Objetivo: <span class="mono">${fmt.format(Math.round(totalBTU))} BTU</span>.
-          ${overshoot ? "Se permiten combinaciones que excedan el objetivo." : "No se permite exceder; intenta con más equipos."}
-          Capacidad mínima: <span class="mono">${Math.round(minCap/1000)} KBTU</span>.
-          Máx. equipos (auto): <span class="mono">${autoMax}</span>.`;
+        var minCap=Math.min.apply(null, unidades);
+        $("nota").innerHTML =
+          'Objetivo: <span class="mono">'+fmt.format(Math.round(totalBTU))+' BTU</span>. '+
+          (overshoot ? 'Se permiten combinaciones que excedan el objetivo.' : 'No se permite exceder; intenta con más equipos.')+
+          ' Capacidad mínima: <span class="mono">'+Math.round(minCap/1000)+' KBTU</span>. '+
+          'Máx. equipos (auto): <span class="mono">'+autoMax+'</span>.';
       }
 
-      // --- Construcción de PDF reutilizable (descargar/compartir) ---
+      // --- Construcción PDF (reutilizable) ---
       async function buildPdf(){
-        const { jsPDF } = window.jspdf;
-        const doc=new jsPDF({ unit:'mm', format:'a4' });
-        const logo=await loadLogoDataURL();
-        const now=new Date(); const fecha=now.toLocaleString('es-MX');
-        const fileName=`JC-HVAC-BTU-${now.toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`;
+        var jsPDF = window.jspdf.jsPDF;
+        var doc=new jsPDF({ unit:'mm', format:'a4' });
+        var logo=await loadLogoDataURL();
+        var now=new Date(); var fecha=now.toLocaleString('es-MX');
+        var fileName='JC-HVAC-BTU-'+now.toISOString().slice(0,19).replace(/[:T]/g,'-')+'.pdf';
 
-        // Encabezado
         doc.setFont('helvetica','bold'); doc.setFontSize(16);
-        doc.text('Put Your Logo Here',14,18);
-        if(logo){ try{ doc.addImage(logo,'PNG',170,10,26,26); }catch{} }
+        doc.text('Put Your Logo Here',14,18); // sin marca ajena
+        if(logo){ try{ doc.addImage(logo,'PNG',170,10,26,26); }catch(e){} }
         doc.setFont('helvetica','normal'); doc.setFontSize(11);
-        doc.text('Reporte de cálculo BTU',14,26); doc.text(`Fecha: ${fecha}`,14,32);
+        doc.text('Reporte de cálculo BTU',14,26); doc.text('Fecha: '+fecha,14,32);
 
-        let y=42, x=14;
+        var y=42, x=14;
 
-        // Cliente
-        const cn=($("clienteNombre").value||"").trim();
-        const cd=($("clienteDireccion").value||"").trim();
-        const ct=($("clienteTelefono").value||"").trim();
+        var cn=($("clienteNombre").value||"").trim();
+        var cd=($("clienteDireccion").value||"").trim();
+        var ct=($("clienteTelefono").value||"").trim();
         if(cn||cd||ct){
           doc.setFont('helvetica','bold'); doc.text('Cliente',x,y); y+=6;
           doc.setFont('helvetica','normal');
-          if(cn){ doc.text(`Nombre: ${cn}`,x,y); y+=6; }
-          if(cd){ doc.text(`Dirección: ${cd}`,x,y); y+=6; }
-          if(ct){ doc.text(`Teléfono: ${ct}`,x,y); y+=6; }
+          if(cn){ doc.text('Nombre: '+cn, x, y); y+=6; }
+          if(cd){ doc.text('Dirección: '+cd, x, y); y+=6; }
+          if(ct){ doc.text('Teléfono: '+ct, x, y); y+=6; }
           y+=2;
         }
 
-        // Entradas
-        const area=$("area").value||"";
-        const personas=$("personas").value||"0";
-        const areaVentanas=$("areaVentanas").value||"0";
-        const luminarias=$("luminarias").value||"0";
-        const overshootTxt=$("toggleOvershoot").checked?"Sí":"No";
+        var area=$("area").value||"";
+        var personas=$("personas").value||"0";
+        var areaVentanas=$("areaVentanas").value||"0";
+        var luminarias=$("luminarias").value||"0";
+        var overshootTxt=$("toggleOvershoot").checked?'Sí':'No';
 
         doc.setFont('helvetica','bold'); doc.text('Entradas',x,y); y+=6;
         doc.setFont('helvetica','normal');
-        [ `Área del local: ${area} m²`,
-          `Personas: ${personas}`,
-          `Área de ventanas: ${areaVentanas} m²`,
-          `Luminarias: ${luminarias}`,
-          `Permitir sobrecapacidad: ${overshootTxt}`].forEach(t=>{ doc.text(t,x,y); y+=6; });
+        [ 'Área del local: '+area+' m²',
+          'Personas: '+personas,
+          'Área de ventanas: '+areaVentanas+' m²',
+          'Luminarias: '+luminarias,
+          'Permitir sobrecapacidad: '+overshootTxt ].forEach(function(t){ doc.text(t,x,y); y+=6; });
 
         y+=2;
-        // Resultado
         doc.setFont('helvetica','bold'); doc.text('Resultado',x,y); y+=6;
         doc.setFont('helvetica','normal');
-        doc.text(`Total: ${fmt.format(Math.round(lastTotal))} BTU  (≈ ${tonsFromBTU(lastTotal).toFixed(2)} ton)`,x,y);
+        doc.text('Total: '+fmt.format(Math.round(lastTotal))+' BTU  (≈ '+tonsFromBTU(lastTotal).toFixed(2)+' ton)', x, y);
         y+=8;
 
-        // Combos
-        doc.setFont('helvetica','bold'); doc.text('Mejores combinaciones (top 5)',x,y); y+=6;
+        doc.setFont('helvetica','bold'); doc.text('Mejores combinaciones (top 5)', x, y); y+=6;
         doc.setFont('helvetica','normal');
-        lastCombos.forEach((c,i)=>{
-          const k=c.listaBTU.map(v=>`${Math.round(v/1000)} KBTU`).join(' + ');
-          const diff=c.suma-lastTotal, sign=diff>=0?'+':'−', abs=fmt.format(Math.round(Math.abs(diff)));
-          const l1=`${i+1}) ${k}`;
-          const l2=`Suma: ${fmt.format(Math.round(c.suma))} BTU (≈ ${tonsFromBTU(c.suma).toFixed(2)} ton)  ·  Δ ${sign}${abs} BTU`;
+        lastCombos.forEach(function(c,i){
+          var k=c.listaBTU.map(function(v){ return Math.round(v/1000)+' KBTU'; }).join(' + ');
+          var diff=c.suma-lastTotal; var sign=diff>=0?'+':'−'; var abs=fmt.format(Math.round(Math.abs(diff)));
+          var l1=(i+1)+') '+k;
+          var l2='Suma: '+fmt.format(Math.round(c.suma))+' BTU (≈ '+tonsFromBTU(c.suma).toFixed(2)+' ton)  ·  Δ '+sign+abs+' BTU';
           if(y>270){ doc.addPage(); y=18; }
           doc.text(l1,x,y); y+=6; doc.text(l2,x+4,y); y+=7;
         });
 
-        return { doc, fileName };
+        return { doc: doc, fileName: fileName };
       }
 
       async function descargarPDF(){
         if(!lastTotal) calcular();
-        const { doc, fileName } = await buildPdf();
+        var built = await buildPdf();
+        var doc=built.doc, fileName=built.fileName;
+
         try{
-          await doc.save(fileName,{ returnPromise:true });
-        }catch{
-          const url=doc.output('bloburl'); window.open(url,'_blank');
-        }
+          if(!isIOS()){
+            var p = doc.save(fileName, { returnPromise:true });
+            if(p && typeof p.then==='function'){ await p; return; }
+          }
+        }catch(e){ /* fallback abajo */ }
+
+        // Fallback iOS / navegadores estrictos
+        var blob = doc.output('blob');
+        var url = URL.createObjectURL(blob);
+
+        // Intentar <a download>
+        var a=document.createElement('a');
+        a.href=url; a.download=fileName;
+        document.body.appendChild(a); a.click(); a.remove();
+
+        // iOS abre en nueva pestaña (descarga/compartir manual)
+        if(isIOS()){ window.open(url,'_blank'); }
+
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
       }
 
       async function compartir(){
         if(!lastTotal) calcular();
 
-        const { doc, fileName } = await buildPdf();
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
+        var built = await buildPdf();
+        var doc=built.doc, fileName=built.fileName;
+        var blob = doc.output('blob');
+        var file;
+        try{
+          file = new File([blob], fileName, { type: 'application/pdf' });
+        }catch(e){
+          // Safari viejo: sin File constructor
+          file = blob;
+        }
 
-        const resumen = `Cálculo BTU
-Total: ${fmt.format(Math.round(lastTotal))} BTU (≈ ${tonsFromBTU(lastTotal).toFixed(2)} ton)
-Top: ${lastCombos[0] ? lastCombos[0].listaBTU.map(v=>Math.round(v/1000)+' KBTU').join(' + ') : 'N/A'}`;
+        var resumen = 'Cálculo BTU\nTotal: '+fmt.format(Math.round(lastTotal))+' BTU (≈ '+tonsFromBTU(lastTotal).toFixed(2)+' ton)\nTop: '+(lastCombos[0]? lastCombos[0].listaBTU.map(function(v){return Math.round(v/1000)+' KBTU';}).join(' + ') : 'N/A');
 
         try{
           if(navigator.canShare && navigator.canShare({ files:[file] })){
-            await navigator.share({
-              title: 'Reporte BTU - JC',
-              text: resumen,
-              files: [file]
-            });
+            await navigator.share({ title:'Reporte BTU', text:resumen, files:[file] });
             return;
           }
-        }catch{} // cae a fallback
+          if(navigator.share){
+            await navigator.share({ title:'Reporte BTU', text:resumen });
+            return;
+          }
+        }catch(e){ /* cae a fallback */ }
 
-        // Fallback: WhatsApp (texto) + abrir PDF en nueva pestaña para que lo guarden/adjunten
-        const urlBlob = URL.createObjectURL(blob);
-        window.open(urlBlob, '_blank'); // abrir PDF
-        const wa = `https://wa.me/?text=${encodeURIComponent(resumen)}`;
-        setTimeout(()=>window.open(wa,'_blank'), 400);
-
-        // Fallback email (sin adjunto automático): abre compose con texto
-        const mail = `mailto:?subject=${encodeURIComponent('Reporte BTU - JC')}&body=${encodeURIComponent(resumen)}`;
-        setTimeout(()=>window.location.href=mail, 1000);
+        var urlBlob = URL.createObjectURL(blob);
+        window.open(urlBlob, '_blank'); // abrir PDF para guardar/compartir
+        var wa = 'https://wa.me/?text='+encodeURIComponent(resumen);
+        setTimeout(function(){ window.open(wa,'_blank'); }, 400);
       }
 
       function resetAll(){
-        ["clienteNombre","clienteDireccion","clienteTelefono","area","personas","areaVentanas","luminarias"].forEach(id=>$(id).value="");
-        ["s5","tons"].forEach(id=>$(id).textContent="—");
-        $("combos").innerHTML=""; $("nota").textContent="";
+        ['clienteNombre','clienteDireccion','clienteTelefono','area','personas','areaVentanas','luminarias'].forEach(function(id){ $(id).value=''; });
+        ['s5','tons'].forEach(function(id){ $(id).textContent='—'; });
+        $('combos').innerHTML=''; $('nota').textContent='';
         lastTotal=0; lastCombos=[];
       }
 
-      $("btnCalcular").addEventListener("click", calcular);
-      $("btnPdf").addEventListener("click", descargarPDF);
-      $("btnShare").addEventListener("click", compartir);
-      $("btnReset").addEventListener("click", resetAll);
+      // Eventos
+      $('btnCalcular').addEventListener('click', calcular);
+      $('btnPdf').addEventListener('click', descargarPDF);
+      $('btnReset').addEventListener('click', resetAll);
+
+      // Mostrar "Compartir" si el navegador lo soporta
+      (function(){
+        var shareOk = !!navigator.share || (navigator.canShare && navigator.canShare({ files: [] }));
+        $('btnShare').style.display = shareOk ? 'inline-block' : 'none';
+        if(shareOk){ $('btnShare').addEventListener('click', compartir); }
+      })();
 
       // Prefill demo
-      if(!$("area").value){
-        $("clienteNombre").value="Juan Perez";
-        $("clienteDireccion").value="San Francisco 730, Colonia Fuentes de San Hildefonso";
-        $("clienteTelefono").value="9981554466";
-        $("area").value="75"; $("personas").value="23"; $("areaVentanas").value="9.6"; $("luminarias").value="20";
+      if(!$('area').value){
+        $('clienteNombre').value='Juan Perez';
+        $('clienteDireccion').value='San Francisco 730, Colonia Fuentes de San Hildefonso';
+        $('clienteTelefono').value='9981554466';
+        $('area').value='75'; $('personas').value='23'; $('areaVentanas').value='9.6'; $('luminarias').value='20';
       }
       calcular();
     </script>
