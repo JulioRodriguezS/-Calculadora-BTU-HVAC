@@ -1,0 +1,270 @@
+<!-- /app/index.html -->
+<!DOCTYPE html>
+<html lang="es" class="ion-dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculadora BTU - JC, Electricista y Climatización</title>
+    <!-- Ionic Core (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- jsPDF para PDF -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <style>
+      :root {
+        --app-bg: #0b0f13;
+        --card-bg: #12171d;
+        --muted: #9aa4b2;
+        --accent: #313132;
+        --danger: #f87171;
+        --ok: #fbfcff;
+        --ion-background-color: var(--app-bg);
+        --ion-text-color: #e5e7eb;
+        --ion-card-background: var(--card-bg);
+        --ion-color-primary: var(--accent);
+        --ion-color-primary-contrast: #0b0f13;
+      }
+
+      ion-content {
+        --padding-start: 14px;
+        --padding-end: 14px;
+        --padding-bottom: 24px;
+      }
+
+      ion-card {
+        border-radius: 18px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      @media(min-width:880px) {
+        .row-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: .82rem;
+      }
+
+      .mono {
+        font-variant-numeric: tabular-nums;
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      .kpi {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+      }
+
+      .box {
+        background: #0f141a;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 0 0 1px #1f2937 inset;
+      }
+
+      .box h1 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .box .val {
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        background: #0e141a;
+        border: 1px solid #1f2937;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: .85rem;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--danger);
+      }
+
+      ion-item {
+        margin-top: 1px;
+        border: 1px solid #1f2937;
+      }
+
+      ion-input,
+      ion-textarea {
+        --background: #ffffff;
+        --padding-top: 10px;
+        --padding-bottom: 10px;
+        border-radius: 12px;
+      }
+
+      ion-card-title {
+        color: cornflowerblue;
+      }
+
+      .cta {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        color: #ffffff;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .logo {
+        width: 22px;
+        height: 22px;
+        vertical-align: -5px;
+        margin-right: 8px;
+        border-radius: 4px;
+      }
+    </style>
+    <script type="module" crossorigin src="/-Calculadora-BTU-HVAC/assets/index-Ctd21eKM.js"></script>
+  </head>
+  <body>
+    <ion-app>
+      <ion-header translucent="true">
+        <ion-toolbar color="dark">
+          <ion-title>
+            <ion-icon name="snow-outline" style="vertical-align:-3px;margin-right:6px;"></ion-icon>
+            Calculadora BTU • HVAC
+          </ion-title>
+          <ion-buttons slot="end">
+            <ion-button id="btnReset" fill="clear" aria-label="Reiniciar">
+              <ion-icon name="refresh-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content fullscreen="true">
+        <!-- DATOS DEL CLIENTE -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Datos del cliente (opcional)</ion-card-title>
+            <ion-card-subtitle class="muted">Se muestran en el PDF si están llenos.</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="row">
+              <ion-item fill="solid">
+                <ion-label position="stacked">Nombre</ion-label>
+                <ion-input id="clienteNombre" type="text" placeholder="Juan Perez"></ion-input>
+              </ion-item>
+              <ion-item fill="solid">
+                <ion-label position="stacked">Teléfono</ion-label>
+                <ion-input id="clienteTelefono" type="tel" placeholder="9981554466" inputmode="tel"></ion-input>
+              </ion-item>
+            </div>
+            <ion-item fill="solid">
+              <ion-label position="stacked">Dirección</ion-label>
+              <ion-textarea id="clienteDireccion" placeholder="San Francisco 730, Colonia Fuentes de San Hildefonso" auto-grow="true"></ion-textarea>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+        <!-- ENTRADAS DE CÁLCULO -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Entradas</ion-card-title>
+            <ion-card-subtitle class="muted">Todo suma al TOTAL.</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="row">
+              <ion-item fill="solid">
+                <ion-label position="stacked">Área del local (m²)</ion-label>
+                <ion-input id="area" type="number" step="0.01" inputmode="decimal" placeholder="75"></ion-input>
+              </ion-item>
+              <ion-item fill="solid">
+                <ion-label position="stacked">Personas</ion-label>
+                <ion-input id="personas" type="number" step="1" inputmode="numeric" placeholder="23"></ion-input>
+              </ion-item>
+            </div>
+            <div class="row">
+              <ion-item fill="solid">
+                <ion-label position="stacked">Área total de ventanas (m²)</ion-label>
+                <ion-input id="areaVentanas" type="number" step="0.01" inputmode="decimal" placeholder="9.6"></ion-input>
+              </ion-item>
+              <ion-item fill="solid">
+                <ion-label position="stacked">Luminarias (unidades)</ion-label>
+                <ion-input id="luminarias" type="number" step="1" inputmode="numeric" placeholder="20"></ion-input>
+              </ion-item>
+            </div>
+            <ion-item lines="full" style="margin-top:6px;">
+              <ion-label>Permitir sobrecapacidad</ion-label>
+              <ion-toggle id="toggleOvershoot" checked="true"></ion-toggle>
+            </ion-item>
+            <div class="cta">
+              <ion-button id="btnCalcular" expand="block" style="color: #e5e7eb; border-radius: 2px; border: 2px solid #e5e7eb;">
+                <ion-icon slot="start" name="calculator-outline"></ion-icon> Calcular
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        <!-- RESULTADO (SOLO TOTAL) -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Resultado</ion-card-title>
+            <ion-card-subtitle class="muted">Total requerido</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="kpi">
+              <div class="box">
+                <h1>Total BTU</h1>
+                <div class="val mono" id="s5">—</div>
+                <div class="hint">Toneladas ≈ <span class="mono" id="tons">—</span>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        <!-- COMBINACIONES -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Sección 6 · Combinación de equipos</ion-card-title>
+            <ion-card-subtitle class="muted">Sugerencias top (cercanas al total)</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content class="grid">
+            <div id="combos"></div>
+            <div id="nota" class="hint" style="margin-top:8px;"></div>
+            <div class="cta" style="margin-top:10px;">
+              <ion-button id="btnPdf" fill="outline" color="medium" expand="block" style="color: #fbfcff !important;">
+                <ion-icon slot="start" name="download-outline"></ion-icon> Descargar PDF
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        <ion-footer collapse="fade">
+          <ion-toolbar>
+            <ion-title size="small" class="muted">Ionic Dark UI</ion-title>
+          </ion-toolbar>
+        </ion-footer>
+      </ion-content>
+    </ion-app>
+  </body>
+</html>
