@@ -1,0 +1,31 @@
+@'
+# Node/Vite
+node_modules/
+dist/
+.vite/
+*.local
+
+# Capacitor / Android
+android/
+ios/
+*.keystore
+*.jks
+*.keystore.properties
+*.gradle/
+.cxx/
+
+# IDE
+.vscode/
+.idea/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Builds / artefactos
+*.log
+*.pdf
+
+# Cache
+npm-cache/
+'@ | Set-Content -Encoding UTF8 .gitignore
