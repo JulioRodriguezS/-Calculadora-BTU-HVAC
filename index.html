@@ -4,151 +4,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Calculadora BTU - JC, Electricista y Climatización</title>
+    <title>Calculadora BTU</title>
+
     <!-- Ionic Core (CDN) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <!-- jsPDF para PDF -->
+    <!-- jsPDF -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
     <style>
-      :root {
-        --app-bg: #0b0f13;
-        --card-bg: #12171d;
-        --muted: #9aa4b2;
-        --accent: #313132;
-        --danger: #f87171;
-        --ok: #fbfcff;
-        --ion-background-color: var(--app-bg);
-        --ion-text-color: #e5e7eb;
-        --ion-card-background: var(--card-bg);
-        --ion-color-primary: var(--accent);
-        --ion-color-primary-contrast: #0b0f13;
+      :root{
+        --app-bg:#0b0f13; --card-bg:#12171d; --muted:#9aa4b2; --accent:#313132; --danger:#f87171; --ok:#fbfcff;
+        --ion-background-color:var(--app-bg); --ion-text-color:#e5e7eb; --ion-card-background:var(--card-bg);
+        --ion-color-primary:var(--accent); --ion-color-primary-contrast:#0b0f13;
       }
-
-      ion-content {
-        --padding-start: 14px;
-        --padding-end: 14px;
-        --padding-bottom: 24px;
-      }
-
-      ion-card {
-        border-radius: 18px;
-      }
-
-      .row {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-
-      @media(min-width:880px) {
-        .row-3 {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-
-      .hint {
-        color: var(--muted);
-        font-size: .82rem;
-      }
-
-      .mono {
-        font-variant-numeric: tabular-nums;
-        font-family: ui-monospace, Menlo, Consolas, monospace;
-      }
-
-      .kpi {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 10px;
-      }
-
-      .box {
-        background: #0f141a;
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 0 0 1px #1f2937 inset;
-      }
-
-      .box h1 {
-        margin: 0 0 8px;
-        font-size: 1.1rem;
-        color: var(--muted);
-        font-weight: 600;
-      }
-
-      .box .val {
-        font-size: 1.6rem;
-        font-weight: 800;
-      }
-
-      .chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .chip {
-        background: #0e141a;
-        border: 1px solid #1f2937;
-        border-radius: 999px;
-        padding: 6px 10px;
-        font-size: .85rem;
-      }
-
-      .ok {
-        color: var(--ok);
-      }
-
-      .warn {
-        color: var(--danger);
-      }
-
-      ion-item {
-        margin-top: 1px;
-        border: 1px solid #1f2937;
-      }
-
-      ion-input,
-      ion-textarea {
-        --background: #ffffff;
-        --padding-top: 10px;
-        --padding-bottom: 10px;
-        border-radius: 12px;
-      }
-
-      ion-card-title {
-        color: cornflowerblue;
-      }
-
-      .cta {
-        margin-top: 8px;
-        display: flex;
-        gap: 8px;
-        color: #ffffff;
-      }
-
-      .right {
-        text-align: right;
-      }
-
-      .muted {
-        color: var(--muted);
-      }
-
-      .logo {
-        width: 22px;
-        height: 22px;
-        vertical-align: -5px;
-        margin-right: 8px;
-        border-radius: 4px;
-      }
+      ion-content{ --padding-start:14px; --padding-end:14px; --padding-bottom:24px; }
+      ion-card{ border-radius:18px; }
+      .row{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+      @media(min-width:880px){ .row-3{ grid-template-columns:repeat(3,1fr); } }
+      .hint{ color:var(--muted); font-size:.82rem; }
+      .mono{ font-variant-numeric:tabular-nums; font-family:ui-monospace, Menlo, Consolas, monospace; }
+      .kpi{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+      .box{ background:#0f141a; border-radius:16px; padding:16px; box-shadow:0 0 0 1px #1f2937 inset; }
+      .box h1{ margin:0 0 8px; font-size:1.1rem; color:var(--muted); font-weight:600; }
+      .box .val{ font-size:1.6rem; font-weight:800; }
+      .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+      .chip{ background:#0e141a; border:1px solid #1f2937; border-radius:999px; padding:6px 10px; font-size:.85rem; }
+      .ok{ color:var(--ok); } .warn{ color:var(--danger); }
+      ion-item{ margin-top:1px; border:1px solid #1f2937; }
+      ion-input,ion-textarea{ --background:#ffffff; --padding-top:10px; --padding-bottom:10px; border-radius:12px; }
+      ion-card-title{ color:cornflowerblue; }
+      .cta{ margin-top:8px; display:flex; gap:8px; color:#ffffff; }
+      .right{ text-align:right; }
+      .muted{ color:var(--muted); }
+      .logo{ width:22px; height:22px; vertical-align:-5px; margin-right:8px; border-radius:4px; }
     </style>
-    <script type="module" crossorigin src="/-Calculadora-BTU-HVAC/assets/index-Ctd21eKM.js"></script>
+    <script type="module" crossorigin src="/-Calculadora-BTU-HVAC/assets/index-B5Qt9EMX.js"></script>
   </head>
+
   <body>
     <ion-app>
       <ion-header translucent="true">
@@ -164,6 +60,7 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
+
       <ion-content fullscreen="true">
         <!-- DATOS DEL CLIENTE -->
         <ion-card>
@@ -188,7 +85,8 @@
             </ion-item>
           </ion-card-content>
         </ion-card>
-        <!-- ENTRADAS DE CÁLCULO -->
+
+        <!-- ENTRADAS -->
         <ion-card>
           <ion-card-header>
             <ion-card-title>Entradas</ion-card-title>
@@ -215,18 +113,21 @@
                 <ion-input id="luminarias" type="number" step="1" inputmode="numeric" placeholder="20"></ion-input>
               </ion-item>
             </div>
+
             <ion-item lines="full" style="margin-top:6px;">
               <ion-label>Permitir sobrecapacidad</ion-label>
               <ion-toggle id="toggleOvershoot" checked="true"></ion-toggle>
             </ion-item>
+
             <div class="cta">
-              <ion-button id="btnCalcular" expand="block" style="color: #e5e7eb; border-radius: 2px; border: 2px solid #e5e7eb;">
+              <ion-button id="btnCalcular" expand="block" style="color:#e5e7eb;border-radius:2px;border:2px solid #e5e7eb;">
                 <ion-icon slot="start" name="calculator-outline"></ion-icon> Calcular
               </ion-button>
             </div>
           </ion-card-content>
         </ion-card>
-        <!-- RESULTADO (SOLO TOTAL) -->
+
+        <!-- RESULTADO -->
         <ion-card>
           <ion-card-header>
             <ion-card-title>Resultado</ion-card-title>
@@ -237,13 +138,13 @@
               <div class="box">
                 <h1>Total BTU</h1>
                 <div class="val mono" id="s5">—</div>
-                <div class="hint">Toneladas ≈ <span class="mono" id="tons">—</span>
-                </div>
+                <div class="hint">Toneladas ≈ <span class="mono" id="tons">—</span></div>
               </div>
             </div>
           </ion-card-content>
         </ion-card>
-        <!-- COMBINACIONES -->
+
+        <!-- COMBINACIONES + EXPORT -->
         <ion-card>
           <ion-card-header>
             <ion-card-title>Sección 6 · Combinación de equipos</ion-card-title>
@@ -253,18 +154,307 @@
             <div id="combos"></div>
             <div id="nota" class="hint" style="margin-top:8px;"></div>
             <div class="cta" style="margin-top:10px;">
-              <ion-button id="btnPdf" fill="outline" color="medium" expand="block" style="color: #fbfcff !important;">
+              <ion-button id="btnPdf" fill="outline" color="medium" expand="block" style="color:#fbfcff !important;">
                 <ion-icon slot="start" name="download-outline"></ion-icon> Descargar PDF
               </ion-button>
+              <!-- <ion-button id="btnShare" expand="block" color="primary" style="display:none;">
+                <ion-icon slot="start" name="share-social-outline"></ion-icon> Compartir
+              </ion-button> -->
             </div>
           </ion-card-content>
         </ion-card>
+
         <ion-footer collapse="fade">
           <ion-toolbar>
             <ion-title size="small" class="muted">Ionic Dark UI</ion-title>
           </ion-toolbar>
         </ion-footer>
       </ion-content>
-    </ion-app>
+    </ion-app>
+
+    <!-- JS sin module para máxima compatibilidad móvil -->
+    <script defer>
+      // --- Constantes ---
+      var BASE_AREA_M2=30, BASE_AREA_BTUS=28800;
+      var BTU_POR_PERSONA=650, BTU_POR_M2_VENTANA=450, BTU_POR_LUMINARIA=200;
+      var CAPACIDADES_KBTU=[12,18,24,36,46];
+      var MIN_CAP_KBTU=Math.min.apply(null, CAPACIDADES_KBTU);
+
+      var fmt=new Intl.NumberFormat('es-MX');
+      var $=function(id){ return document.getElementById(id); };
+      var n=function(v){ var x=parseFloat(String(v).replace(',','.')); return isFinite(x)?x:0; };
+      var tonsFromBTU=function(btus){ return btus/12000; };
+
+      var lastTotal=0, lastCombos=[];
+
+      function isIOS(){
+        return /iphone|ipad|ipod/i.test(navigator.userAgent);
+      }
+
+      async function loadLogoDataURL(){
+        try{
+          var url=new URL('logo.png', document.baseURI).toString();
+          var resp=await fetch(url); if(!resp.ok) return null;
+          var blob=await resp.blob();
+          return await new Promise(function(res,rej){
+            var r=new FileReader();
+            r.onload=function(){ res(r.result); };
+            r.onerror=rej;
+            r.readAsDataURL(blob);
+          });
+        }catch(e){ return null; }
+      }
+
+      function mejoresCombos(target, unidadesBTU, maxEquipos, permitirSobre, topN){
+        if(maxEquipos==null) maxEquipos=4;
+        if(permitirSobre==null) permitirSobre=true;
+        if(topN==null) topN=5;
+
+        var res=[]; var bestAbs=Infinity;
+        unidadesBTU.sort(function(a,b){ return b-a; });
+
+        function rank(a,b){
+          if(a.diff!==b.diff) return a.diff-b.diff;
+          if(a.equipos!==b.equipos) return a.equipos-b.equipos;
+          if(permitirSobre){
+            var as=a.suma>=target?0:1, bs=b.suma>=target?0:1;
+            if(as!==bs) return as-bs;
+          }
+          return b.suma-a.suma;
+        }
+
+        function push(combo){
+          var suma=combo.reduce(function(x,y){ return x+y; },0);
+          var diff=Math.abs(target-suma);
+          var item={ listaBTU: combo.slice(), suma: suma, diff: diff, equipos: combo.length };
+          var dup=res.some(function(x){ return x.suma===suma && x.equipos===item.equipos; });
+          if(!dup){
+            res.push(item); res.sort(rank);
+            if(res.length>topN) res.length=topN;
+            bestAbs = res.length>0 && typeof res[0].diff==='number' ? res[0].diff : bestAbs; // sin ?.
+          }
+        }
+
+        function dfs(i, combo, suma){
+          if(combo.length>0) push(combo);
+          if(combo.length===maxEquipos) return;
+          for(var idx=i; idx<unidadesBTU.length; idx++){
+            var cap=unidadesBTU[idx], ns=suma+cap;
+            if(!permitirSobre && ns>target) continue;
+            if(res.length && Math.abs(target-ns) > bestAbs + cap) continue;
+            combo.push(cap); dfs(idx, combo, ns); combo.pop();
+          }
+        }
+        dfs(0, [], 0);
+        return res;
+      }
+
+      function calcular(){
+        var area=Math.max(0,n($("area").value));
+        var personas=Math.max(0,Math.floor(n($("personas").value)));
+        var areaVentanas=Math.max(0,n($("areaVentanas").value));
+        var luminarias=Math.max(0,Math.floor(n($("luminarias").value)));
+
+        var btusArea=(BASE_AREA_BTUS*area)/BASE_AREA_M2;
+        var btusPersonas=BTU_POR_PERSONA*personas;
+        var btusVentanas=BTU_POR_M2_VENTANA*areaVentanas;
+        var btusLuminarias=BTU_POR_LUMINARIA*luminarias;
+        var total=btusArea+btusPersonas+btusVentanas+btusLuminarias;
+
+        $("s5").textContent=fmt.format(Math.round(total))+" BTU";
+        $("tons").textContent=tonsFromBTU(total).toFixed(2)+" ton";
+
+        lastTotal=total; pintarCombos(total);
+      }
+
+      function pintarCombos(totalBTU){
+        var unidades=CAPACIDADES_KBTU.map(function(k){ return Math.round(k*1000); });
+        var overshoot=$("toggleOvershoot").checked;
+        var autoMax=Math.min(8, Math.max(3, Math.ceil(totalBTU/(MIN_CAP_KBTU*1000))+2));
+        var combos=mejoresCombos(totalBTU, unidades, autoMax, overshoot, 5);
+        lastCombos=combos;
+
+        var cont=$("combos"); cont.innerHTML="";
+        if(!combos.length){
+          cont.innerHTML='<div class="hint">No hay combinación posible con los límites actuales.</div>';
+          $("nota").textContent=""; return;
+        }
+
+        cont.innerHTML=combos.map(function(c,i){
+          var diff=c.suma-lastTotal, sign=diff>=0?"+":"−", abs=Math.abs(diff), clase=diff>=0?"ok":"warn";
+          var k=c.listaBTU.map(function(x){ return Math.round(x/1000); });
+          return (
+            '<ion-item lines="full">'+
+              '<ion-label>'+
+                '<div><strong>#'+(i+1)+'</strong> • '+c.equipos+' equipo(s)</div>'+
+                '<div class="chips" style="margin:6px 0 8px;">'+ k.map(function(x){ return '<span class="chip">'+x+' KBTU</span>'; }).join('') +'</div>'+
+                '<div class="muted">Suma: <span class="mono">'+fmt.format(Math.round(c.suma))+'</span> BTU · ≈ <span class="mono">'+tonsFromBTU(c.suma).toFixed(2)+'</span> ton</div>'+
+              '</ion-label>'+
+              '<div slot="end" class="right">'+
+                '<div class="mono '+clase+'">'+sign+fmt.format(Math.round(abs))+' BTU</div>'+
+                '<div class="hint">vs. objetivo</div>'+
+              '</div>'+
+            '</ion-item>'
+          );
+        }).join('');
+
+        var minCap=Math.min.apply(null, unidades);
+        $("nota").innerHTML =
+          'Objetivo: <span class="mono">'+fmt.format(Math.round(totalBTU))+' BTU</span>. '+
+          (overshoot ? 'Se permiten combinaciones que excedan el objetivo.' : 'No se permite exceder; intenta con más equipos.')+
+          ' Capacidad mínima: <span class="mono">'+Math.round(minCap/1000)+' KBTU</span>. '+
+          'Máx. equipos (auto): <span class="mono">'+autoMax+'</span>.';
+      }
+
+      // --- Construcción PDF (reutilizable) ---
+      async function buildPdf(){
+        var jsPDF = window.jspdf.jsPDF;
+        var doc=new jsPDF({ unit:'mm', format:'a4' });
+        var logo=await loadLogoDataURL();
+        var now=new Date(); var fecha=now.toLocaleString('es-MX');
+        var fileName='JC-HVAC-BTU-'+now.toISOString().slice(0,19).replace(/[:T]/g,'-')+'.pdf';
+
+        doc.setFont('helvetica','bold'); doc.setFontSize(16);
+        doc.text('Put Your Logo Here',14,18); // sin marca ajena
+        if(logo){ try{ doc.addImage(logo,'PNG',170,10,26,26); }catch(e){} }
+        doc.setFont('helvetica','normal'); doc.setFontSize(11);
+        doc.text('Reporte de cálculo BTU',14,26); doc.text('Fecha: '+fecha,14,32);
+
+        var y=42, x=14;
+
+        var cn=($("clienteNombre").value||"").trim();
+        var cd=($("clienteDireccion").value||"").trim();
+        var ct=($("clienteTelefono").value||"").trim();
+        if(cn||cd||ct){
+          doc.setFont('helvetica','bold'); doc.text('Cliente',x,y); y+=6;
+          doc.setFont('helvetica','normal');
+          if(cn){ doc.text('Nombre: '+cn, x, y); y+=6; }
+          if(cd){ doc.text('Dirección: '+cd, x, y); y+=6; }
+          if(ct){ doc.text('Teléfono: '+ct, x, y); y+=6; }
+          y+=2;
+        }
+
+        var area=$("area").value||"";
+        var personas=$("personas").value||"0";
+        var areaVentanas=$("areaVentanas").value||"0";
+        var luminarias=$("luminarias").value||"0";
+        var overshootTxt=$("toggleOvershoot").checked?'Sí':'No';
+
+        doc.setFont('helvetica','bold'); doc.text('Entradas',x,y); y+=6;
+        doc.setFont('helvetica','normal');
+        [ 'Área del local: '+area+' m²',
+          'Personas: '+personas,
+          'Área de ventanas: '+areaVentanas+' m²',
+          'Luminarias: '+luminarias,
+          'Permitir sobrecapacidad: '+overshootTxt ].forEach(function(t){ doc.text(t,x,y); y+=6; });
+
+        y+=2;
+        doc.setFont('helvetica','bold'); doc.text('Resultado',x,y); y+=6;
+        doc.setFont('helvetica','normal');
+        doc.text('Total: '+fmt.format(Math.round(lastTotal))+' BTU  (≈ '+tonsFromBTU(lastTotal).toFixed(2)+' ton)', x, y);
+        y+=8;
+
+        doc.setFont('helvetica','bold'); doc.text('Mejores combinaciones (top 5)', x, y); y+=6;
+        doc.setFont('helvetica','normal');
+        lastCombos.forEach(function(c,i){
+          var k=c.listaBTU.map(function(v){ return Math.round(v/1000)+' KBTU'; }).join(' + ');
+          var diff=c.suma-lastTotal; var sign=diff>=0?'+':'−'; var abs=fmt.format(Math.round(Math.abs(diff)));
+          var l1=(i+1)+') '+k;
+          var l2='Suma: '+fmt.format(Math.round(c.suma))+' BTU (≈ '+tonsFromBTU(c.suma).toFixed(2)+' ton)  ·  Δ '+sign+abs+' BTU';
+          if(y>270){ doc.addPage(); y=18; }
+          doc.text(l1,x,y); y+=6; doc.text(l2,x+4,y); y+=7;
+        });
+
+        return { doc: doc, fileName: fileName };
+      }
+
+      async function descargarPDF(){
+        if(!lastTotal) calcular();
+        var built = await buildPdf();
+        var doc=built.doc, fileName=built.fileName;
+
+        try{
+          if(!isIOS()){
+            var p = doc.save(fileName, { returnPromise:true });
+            if(p && typeof p.then==='function'){ await p; return; }
+          }
+        }catch(e){ /* fallback abajo */ }
+
+        // Fallback iOS / navegadores estrictos
+        var blob = doc.output('blob');
+        var url = URL.createObjectURL(blob);
+
+        // Intentar <a download>
+        var a=document.createElement('a');
+        a.href=url; a.download=fileName;
+        document.body.appendChild(a); a.click(); a.remove();
+
+        // iOS abre en nueva pestaña (descarga/compartir manual)
+        if(isIOS()){ window.open(url,'_blank'); }
+
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+      }
+
+      async function compartir(){
+        if(!lastTotal) calcular();
+
+        var built = await buildPdf();
+        var doc=built.doc, fileName=built.fileName;
+        var blob = doc.output('blob');
+        var file;
+        try{
+          file = new File([blob], fileName, { type: 'application/pdf' });
+        }catch(e){
+          // Safari viejo: sin File constructor
+          file = blob;
+        }
+
+        var resumen = 'Cálculo BTU\nTotal: '+fmt.format(Math.round(lastTotal))+' BTU (≈ '+tonsFromBTU(lastTotal).toFixed(2)+' ton)\nTop: '+(lastCombos[0]? lastCombos[0].listaBTU.map(function(v){return Math.round(v/1000)+' KBTU';}).join(' + ') : 'N/A');
+
+        try{
+          if(navigator.canShare && navigator.canShare({ files:[file] })){
+            await navigator.share({ title:'Reporte BTU', text:resumen, files:[file] });
+            return;
+          }
+          if(navigator.share){
+            await navigator.share({ title:'Reporte BTU', text:resumen });
+            return;
+          }
+        }catch(e){ /* cae a fallback */ }
+
+        var urlBlob = URL.createObjectURL(blob);
+        window.open(urlBlob, '_blank'); // abrir PDF para guardar/compartir
+        var wa = 'https://wa.me/?text='+encodeURIComponent(resumen);
+        setTimeout(function(){ window.open(wa,'_blank'); }, 400);
+      }
+
+      function resetAll(){
+        ['clienteNombre','clienteDireccion','clienteTelefono','area','personas','areaVentanas','luminarias'].forEach(function(id){ $(id).value=''; });
+        ['s5','tons'].forEach(function(id){ $(id).textContent='—'; });
+        $('combos').innerHTML=''; $('nota').textContent='';
+        lastTotal=0; lastCombos=[];
+      }
+
+      // Eventos
+      $('btnCalcular').addEventListener('click', calcular);
+      $('btnPdf').addEventListener('click', descargarPDF);
+      $('btnReset').addEventListener('click', resetAll);
+
+      // Mostrar "Compartir" si el navegador lo soporta
+      (function(){
+        var shareOk = !!navigator.share || (navigator.canShare && navigator.canShare({ files: [] }));
+        $('btnShare').style.display = shareOk ? 'inline-block' : 'none';
+        if(shareOk){ $('btnShare').addEventListener('click', compartir); }
+      })();
+
+      // Prefill demo
+      if(!$('area').value){
+        $('clienteNombre').value='Juan Perez';
+        $('clienteDireccion').value='San Francisco 730, Colonia Fuentes de San Hildefonso';
+        $('clienteTelefono').value='9981554466';
+        $('area').value='75'; $('personas').value='23'; $('areaVentanas').value='9.6'; $('luminarias').value='20';
+      }
+      calcular();
+    </script>
   </body>
 </html>
