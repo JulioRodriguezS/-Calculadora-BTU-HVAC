@@ -1,4 +1,3 @@
-<!-- /app/index.html -->
 <!DOCTYPE html>
 <html lang="es" class="ion-dark">
   <head>
@@ -12,7 +11,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Calculadora de BTU's para tus Aires Acondicionados" />
     <meta property="og:description" content="BTU Calculator" />
-    <meta property="og:url" content="https://raw.githubusercontent.com/JulioRodriguezS/thumbs-linkedin/main/ChatGPT%20Image%20Mar%2010,%202026,%2011_04_35%20PM.png" />
+    <meta property="og:url" content="https://juliorodriguezs.github.io/-Calculadora-BTU-HVAC/" />
     <meta property="og:image" content="https://raw.githubusercontent.com/JulioRodriguezS/thumbs-linkedin/main/ChatGPT%20Image%20Mar%2010,%202026,%2011_04_35%20PM.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="627" />
@@ -173,9 +172,9 @@
               <ion-button id="btnPdf" fill="outline" color="medium" expand="block" style="color:#fbfcff !important;">
                 <ion-icon slot="start" name="download-outline"></ion-icon> Descargar PDF
               </ion-button>
-              <!-- <ion-button id="btnShare" expand="block" color="primary" style="display:none;">
+              <ion-button id="btnShare" expand="block" color="primary" style="display:none;">
                 <ion-icon slot="start" name="share-social-outline"></ion-icon> Compartir
-              </ion-button> -->
+              </ion-button>
             </div>
           </ion-card-content>
         </ion-card>
@@ -458,9 +457,15 @@
 
       // Mostrar "Compartir" si el navegador lo soporta
       (function(){
+        var btnShare = $('btnShare');
+        if(!btnShare) return;
+
         var shareOk = !!navigator.share || (navigator.canShare && navigator.canShare({ files: [] }));
-        $('btnShare').style.display = shareOk ? 'inline-block' : 'none';
-        if(shareOk){ $('btnShare').addEventListener('click', compartir); }
+        btnShare.style.display = shareOk ? 'inline-block' : 'none';
+
+        if(shareOk){
+          btnShare.addEventListener('click', compartir);
+        }
       })();
 
       // Prefill demo
